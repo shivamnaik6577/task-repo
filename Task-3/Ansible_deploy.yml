@@ -1,0 +1,63 @@
+---
+- name: Deploy App
+  hosts: my-ec2-ip
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Copy index.js app to server
+      copy:
+        src: /root/myapp/
+        dest: /root/myapp/
+        owner: root
+
+    - name: Build Docker image for index.js app
+      docker_image:
+        name: myapp
+        build:
+          path: /root/myapp
+        state: present
+
+    - name: Run index.js app container
+      docker_container:
+        name: myapp-container
+        image: myapp
+        state: started
+        exposed_ports:
+          - "3000"
+        published_ports:
+          - "3000:3000"
+        restart_policy: always
+
+    - name: Copy Nginx configuration
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/sites-available/myapp
+        owner: root
+        group: root
+
+    - name: Enable Nginx site configuration
+      command: nginx -s reload

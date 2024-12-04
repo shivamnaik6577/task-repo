@@ -1,0 +1,16 @@
+{
+    "name": "myapp",
+    "version": "1.0.0",
+    "description": "This is simple myapp task running od docker",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+
+    "author": "shivamnaik",
+    "dependencies": {
+        "express": "4.0.0"
+    }
+
+
+}
